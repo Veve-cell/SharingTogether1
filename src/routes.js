@@ -50,6 +50,13 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
+//Veve custom
+const Test = React.lazy(() => import('./views/tests/Test'))
+const AdminAccounts = React.lazy(() => import('./views/accounts/admins/AdminAccounts'))
+const UserAccounts = React.lazy(() => import('./views/accounts/users/UserAccounts'))
+const SharingActivities = React.lazy(() => import('./views/sharingActivities/SharingActivities'))
+const Categories = React.lazy(() => import('./views/categories/Categories'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
@@ -95,6 +102,12 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', element: Modals },
   { path: '/notifications/toasts', name: 'Toasts', element: Toasts },
   { path: '/widgets', name: 'Widgets', element: Widgets },
+  // Veve's customs
+  { path: '/accounts/admins', name: 'Admin Accounts', element: AdminAccounts },
+  { path: '/accounts/users', name: 'User Accounts', element: UserAccounts },
+  { path: '/sharingActivities', name: 'Sharing Activities', element: SharingActivities },
+  { path: '/categories', name: 'Categories', element: Categories },
+  { path: '/tests', name: 'testing', element: Test },
 ]
 
 export default routes

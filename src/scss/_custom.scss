@@ -1,1 +1,37 @@
 // Here you can add other styles
+// Define biến cho độ rộng của sidebar
+$custom-sidebar-width: 300px;
+
+
+// Định nghĩa biến màu
+$custom-primary-color: #5878BF;
+
+// Sử dụng mixin để áp dụng độ rộng cho sidebar
+@mixin customSidebar {
+  width: $custom-sidebar-width;
+  background-color: $custom-primary-color;
+  color: #00ff00;
+}
+
+$custom-secondary-color: #00ff00;
+
+
+// Áp dụng mixin vào thành phần sidebar
+.custom-sidebar {
+  @include customSidebar;
+  //@include primaryColor;
+}
+
+$custom-background-color: #D4EBFC; // Mã màu tùy chỉnh của bạn
+
+.wrapper {
+  background-color: $custom-background-color;
+  // Các quy tắc CSS khác cho wrapper
+}
+
+$custom-header-background-color: #BBE1FC; // Mã màu tùy chỉnh của bạn
+
+.mb-4 {
+  background-color: $custom-header-background-color;
+  // Các quy tắc CSS khác cho mb-4
+}

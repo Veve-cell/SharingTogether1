@@ -28,10 +28,11 @@ const AppSidebar = () => {
       onVisibleChange={(visible) => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
+      className="custom-sidebar"
     >
       <CSidebarBrand className="d-none d-md-flex" to="/">
-        <CIcon className="sidebar-brand-full" icon={logoNegative} height={35} />
-        <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} />
+        <CIcon className="sidebar-brand-full" icon={logoNegative} height={67} />
+        <CIcon className="sidebar-brand-narrow" icon={sygnet} height={60} />
       </CSidebarBrand>
       <CSidebarNav>
         <SimpleBar>
