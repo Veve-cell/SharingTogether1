@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-undef */
@@ -40,9 +38,6 @@ import { UserListHead, UserListToolbar } from '../../sections/@dashboard/user'
 import categoryApi from 'src/api/categoryApi'
 //import {CRow } from '@coreui/react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
-import StackComponent from './StackComponent'
-import CreateCategoryDialog from './CreateCategoryDialog'
-import CategoryTableRow from './CategoryTableRow'
 //const axios = window.axios; // Import axios for making API calls
 
 
@@ -370,6 +365,7 @@ export default function Category() {
   }, []);
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - categories.length) : 0
+  // const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName)
   const filteredCategories = applySortFilter(categories, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredCategories.length && !!filterName
@@ -381,14 +377,47 @@ export default function Category() {
       </Helmet>
 
       <Container>
-        <StackComponent handleCreateOpenModal={handleCreateOpenModal} />
-        <CreateCategoryDialog
-          createModalOpen={createModalOpen}
-          handleCreateCloseModal={handleCreateCloseModal}
-          newCategory={newCategory}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-        />
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+          {/* <Typography variant="h4" gutterBottom>
+            User
+          </Typography> */}
+          <Button
+            variant="contained"
+            style={{ backgroundColor: '#F9FFEA', color: '#000000' }}
+            startIcon={<Iconify icon="eva:plus-fill" />}
+            onClick={handleCreateOpenModal} // Mở modal khi nhấn nút "New Category"
+          >
+            New Category
+          </Button>
+          <Button variant="contained" style={{ backgroundColor: '#92BA92', color: '#000000' }} startIcon={<Iconify icon="pajamas:export" />}>
+            Export
+          </Button>
+
+          <Dialog open={createModalOpen} onClose={handleCreateCloseModal}>
+            <DialogTitle>Add New Category</DialogTitle>
+            <DialogContent>
+              {/* Nội dung của modal, ví dụ: các trường để người dùng nhập thông tin */}
+              <form>
+                <TextField
+                  fullWidth
+                  label="Name"
+                  name="name"
+                  value={newCategory.name}
+                  onChange={handleChange}
+                  variant="outlined"
+                  margin="normal"
+                />
+              </form>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCreateCloseModal}>Cancel</Button>
+              <Button variant="contained" color="primary" onClick={handleSubmit}>
+                Save
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Stack>
+
         <Card>
           <UserListToolbar
             numSelected={selected.length}
@@ -412,22 +441,97 @@ export default function Category() {
                   {filteredCategories
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((category) => {
+                      //const { id, name, role, status, company, avatarUrl, isVerified } = row
                       const { id, name, lastModifiedDate } = category;
                       const selectedUser = selected.indexOf(id) !== -1
 
                       return (
-                        <CategoryTableRow
+                        <TableRow
+                          hover
                           key={id}
-                          category={category}
-                          selectedUser={selectedUser}
-                          handleClick={handleClick}
-                          handleOpenMenu={handleOpenMenu}
-                          handleMouseDown={handleMouseDown}
-                          open={open}
-                          handleCloseMenu={handleCloseMenu}
-                          handleOpenEditModal={handleOpenEditModal}
-                          handleDelete={handleDelete}
-                        />
+                          tabIndex={-1}
+                          role="checkbox"
+                          selected={selectedUser}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedUser}
+                              onChange={(event) => handleClick(event, id)}
+                            />
+                          </TableCell>
+
+                          {/* <TableCell component="th" scope="row" padding="none">
+                            <Stack direction="row" alignItems="center" spacing={2}>
+                              <Avatar alt={id} src={avatarUrl} />
+                              <Typography variant="subtitle2" noWrap>
+                                {id}
+                              </Typography>
+                            </Stack>
+                          </TableCell> */}
+
+                          <TableCell align="left">{id}</TableCell>
+                          <TableCell align="left">{name}</TableCell>
+                          <TableCell align="left">{lastModifiedDate}</TableCell>
+
+                          {/* <TableCell align="left">{phoneNumber}</TableCell>
+
+                          <TableCell align="left">{email}</TableCell>
+
+                          <TableCell align="left">{className}</TableCell>
+
+                          <TableCell align="left">{isOnline ? 'Yes' : 'No'}</TableCell> */}
+
+                          {/* <TableCell align="left">
+                            <Label color={(isOnline === 'banned' && 'error') || 'success'}>
+                              {sentenceCase(isOnline)}
+                            </Label>
+                          </TableCell> */}
+
+                          <TableCell align="right">
+                            <IconButton
+                              size="large"
+                              color="inherit"
+                              onClick={(event) => handleOpenMenu(event, id)}
+                              onMouseDown={handleMouseDown} //lắng nghe khi chuột được bấm xuống:
+                            >
+                              <Iconify icon={'eva:more-vertical-fill'} />
+                            </IconButton>
+                          </TableCell>
+                          <Popover
+                            open={Boolean(open[id])}
+                            anchorEl={open[id]}
+                            onClose={handleCloseMenu[id]}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            PaperProps={{
+                              sx: {
+                                p: 1,
+                                width: 140,
+                                '& .MuiMenuItem-root': {
+                                  px: 1,
+                                  typography: 'body2',
+                                  borderRadius: 0.75,
+                                },
+                              },
+                            }}
+                          >
+                            <MenuItem onClick={() => handleOpenEditModal(category)}>
+                              <Iconify
+                                icon={'eva:edit-fill'}
+                                sx={{ mr: 2 }}
+                              />
+                              Edit
+                            </MenuItem>
+
+                            <MenuItem
+                              sx={{ color: 'error.main' }}
+                              onClick={() => handleDelete(category.id)}
+                            >
+                              <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+                              Delete
+                            </MenuItem>
+                          </Popover>
+                        </TableRow>
                       )
                     })}
                   {emptyRows > 0 && (
@@ -476,6 +580,42 @@ export default function Category() {
         </Card>
       </Container>
 
+      {/* <Popover
+        open={Boolean(open[id])}
+        anchorEl={open[id]}
+        onClose={handleCloseMenu[id]}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          sx: {
+            p: 1,
+            width: 140,
+            '& .MuiMenuItem-root': {
+              px: 1,
+              typography: 'body2',
+              borderRadius: 0.75,
+            },
+          },
+        }}
+      >
+        <MenuItem
+          onClick={() => handleOpenEditModal(category)}
+        >
+          <Iconify
+            icon={'eva:edit-fill'}
+            sx={{ mr: 2 }}
+          />
+          Edit
+        </MenuItem>
+
+        <MenuItem
+          sx={{ color: 'error.main' }}
+          onClick={() => handleDelete(categories.id)}
+        >
+          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
+          Delete
+        </MenuItem>
+      </Popover> */}
       {/* ----------------------Dialog Edit------------------------------------ */}
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
         <DialogTitle>Edit Category</DialogTitle>
