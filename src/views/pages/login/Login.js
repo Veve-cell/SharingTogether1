@@ -1,5 +1,9 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/jsx-no-undef */
+/* eslint-disable no-undef */
+/* eslint-disable prettier/prettier */
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate  } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -15,8 +19,30 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
+import { useState } from 'react'
 
-const Login = () => {
+
+const Login = ({onLoginSuccess }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    // Perform your login logic here, e.g., communicate with the server to validate credentials
+    // For simplicity, let's assume the login is successful if the username and password are not empty
+    if (username && password) {
+      // Update the user's authentication status (e.g., set a token or user info in local storage)
+      // Then call the onLoginSuccess function to update the login status in the App component
+      onLoginSuccess();
+
+      // Navigate to the default layout or any other protected page
+      navigate('/Home'); // You can redirect to the desired protected page after login
+    } else {
+      // Handle login failure (e.g., show an error message)
+      alert('Invalid username or password. Please try again.');
+    }
+  };
+
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -32,7 +58,12 @@ const Login = () => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder="Username" autoComplete="username" />
+                      <CFormInput
+                        placeholder="Username"
+                        autoComplete="username"
+                        value={username}
+                        onChange={(e)=> setUsername(e.target.value)}
+                      />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
@@ -42,13 +73,15 @@ const Login = () => {
                         type="password"
                         placeholder="Password"
                         autoComplete="current-password"
+                        value={password}
+                        onChange={(e)=> setPassword(e.target.value)}
                       />
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4">
-                          Login
-                        </CButton>
+                          <CButton color="primary" className="px-4" onClick={handleLogin}>
+                            Login
+                          </CButton>
                       </CCol>
                       <CCol xs={6} className="text-right">
                         <CButton color="link" className="px-0">

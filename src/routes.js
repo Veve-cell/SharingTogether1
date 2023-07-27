@@ -56,8 +56,11 @@ const AdminAccounts = React.lazy(() => import('./views/accounts/admins/AdminAcco
 const UserAccounts = React.lazy(() => import('./views/accounts/users/UserAccounts'))
 const SharingActivities = React.lazy(() => import('./views/sharingActivities/SharingActivities'))
 const Categories = React.lazy(() => import('./views/categories/Categories'))
+const Login = React.lazy(() => import('./views/pages/login/Login'))
+// const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
 const routes = [
+  //<Route exact path="/about" element={<About/>}/>
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
@@ -108,6 +111,8 @@ const routes = [
   { path: '/sharingActivities', name: 'Sharing Activities', element: SharingActivities },
   { path: '/categories', name: 'Categories', element: Categories },
   { path: '/tests', name: 'testing', element: Test },
+  { path: '/pages/login', name: 'Login', element: Login },
+  // { path: './layout', name: 'DefaultLayout', element: DefaultLayout },
 ]
 
 export default routes
