@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-undef */
 import React from 'react'
 import {
   CAvatar,
@@ -23,12 +25,31 @@ import {
 import CIcon from '@coreui/icons-react'
 
 import avatar8 from './../../assets/images/avatars/8.jpg'
+import authApi from 'src/api/authApi'
+import { useNavigate } from 'react-router-dom'
 
 const AppHeaderDropdown = () => {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    authApi.logout();
+    navigate('/Login');
+  }
+
+  //Thực hiện lấy thông tin user từ authApi
+  const getUserInfo = () => {
+    try{
+      const userInfo = authApi.getUserInfo();
+      return userInfo;
+    } catch(e){
+      console.log('API error: ',e);
+      return null;
+    }
+  }
+  const user = getUserInfo();
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
-        <CAvatar src={avatar8} size="md" />
+        <CAvatar src={user?.urlAvatar || avatar8} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
@@ -84,9 +105,9 @@ const AppHeaderDropdown = () => {
           </CBadge>
         </CDropdownItem> */}
         <CDropdownDivider />
-        <CDropdownItem href="#">
-          <CIcon icon={cilLockLocked} className="me-2" />
-          Lock Account
+        <CDropdownItem onClick={handleLogout}>
+          <CIcon icon={cilLockLocked} className="me-2"/>
+          {/* Lock Account */} Log out
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

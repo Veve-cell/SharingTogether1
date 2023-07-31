@@ -1,9 +1,11 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-no-undef */
 /* eslint-disable no-undef */
 /* eslint-disable prettier/prettier */
+import authApi from 'src/api/authApi'
 import React from 'react'
-import { Link, useNavigate  } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -22,21 +24,31 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import { useState } from 'react'
 
 
-const Login = ({onLoginSuccess }) => {
-  const [username, setUsername] = useState('');
+const Login = ({ onLoginSuccess }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  //handleLogin được sử dụng để thực hiện logic đăng nhập.
+
+  const handleLogin = async () => {
     // Perform your login logic here, e.g., communicate with the server to validate credentials
     // For simplicity, let's assume the login is successful if the username and password are not empty
-    if (username && password) {
+
+    if (email && password) {
       // Update the user's authentication status (e.g., set a token or user info in local storage)
       // Then call the onLoginSuccess function to update the login status in the App component
-      onLoginSuccess();
 
-      // Navigate to the default layout or any other protected page
-      navigate('/Home'); // You can redirect to the desired protected page after login
+      try {
+        await authApi.login(email, password);
+        // Navigate to the default layout or any other protected page
+        //navigate('/Home'); // You can redirect to the desired protected page after login
+        onLoginSuccess(); // Call the onLoginSuccess function to update isLoggedIn state in App.js
+      } catch (error) {
+        // Handle the error if the import fails
+        alert(error.message);
+      };
     } else {
       // Handle login failure (e.g., show an error message)
       alert('Invalid username or password. Please try again.');
@@ -59,10 +71,10 @@ const Login = ({onLoginSuccess }) => {
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        placeholder="Username"
-                        autoComplete="username"
-                        value={username}
-                        onChange={(e)=> setUsername(e.target.value)}
+                        placeholder="Email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
@@ -74,14 +86,14 @@ const Login = ({onLoginSuccess }) => {
                         placeholder="Password"
                         autoComplete="current-password"
                         value={password}
-                        onChange={(e)=> setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                          <CButton color="primary" className="px-4" onClick={handleLogin}>
-                            Login
-                          </CButton>
+                        <CButton color="primary" className="px-4" onClick={handleLogin}>
+                          Login
+                        </CButton>
                       </CCol>
                       <CCol xs={6} className="text-right">
                         <CButton color="link" className="px-0">

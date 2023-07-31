@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 /* eslint-disable prettier/prettier */
 // import queryString from 'query-string';
@@ -17,6 +18,12 @@ const axiosClient = axios.create(
 // Add a request interceptor
 axiosClient.interceptors.request.use(function (config) {
     // Do something before request is sent
+    (config) => {
+      const token = localStorage.getItem('token');
+      if(token){
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
     return config;
   }, function (error) {
     // Do something with request error
