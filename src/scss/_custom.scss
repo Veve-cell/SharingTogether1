@@ -35,3 +35,35 @@ $custom-header-background-color: #BBE1FC; // Mã màu tùy chỉnh của bạn
   background-color: $custom-header-background-color;
   // Các quy tắc CSS khác cho mb-4
 }
+
+.custom-header {
+  color: #ff0000; /* Màu chữ */
+}
+
+.custom-data-grid {
+  /* Màu nền của bảng */
+  background-color: #ffffff;
+
+  /* Màu chữ trong ô */
+  color: #000;
+
+  /* Màu chữ trong ô tiêu đề */
+  & .MuiDataGrid-colCellTitle {
+    color: #fff;
+  }
+}
+
+// Tùy chỉnh màu nền cho các nút "Columns", "Filters", "Density", và "Export"
+.MuiDataGrid-toolbarContainer {
+  background-color: #92BA92;
+}
+
+// Tùy chỉnh màu chữ cho các nút
+.MuiDataGrid-toolbarContainer .MuiDataGrid-toolbarButton {
+  color: #525E75;
+}
+
+// Tùy chỉnh màu chữ khi hover vào các nút
+.MuiDataGrid-toolbarContainer .MuiDataGrid-toolbarButton:hover {
+  color: #5878BF;
+}
