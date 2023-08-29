@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-no-undef */
@@ -56,15 +58,15 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
+    <div className="login-container min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
           <CCol md={8}>
             <CCardGroup>
-              <CCard className="p-4">
+              <CCard className="p-4 card-login">
                 <CCardBody>
                   <CForm>
-                    <h1>Login</h1>
+                    <h1 className='admin-login-heading'>ADMIN LOGIN</h1>
                     <p className="text-medium-emphasis">Sign In to your account</p>
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
@@ -91,7 +93,7 @@ const Login = ({ onLoginSuccess }) => {
                     </CInputGroup>
                     <CRow>
                       <CCol xs={6}>
-                        <CButton color="primary" className="px-4" onClick={handleLogin}>
+                        <CButton color="primary" className="px-4 login-button" onClick={handleLogin}>
                           Login
                         </CButton>
                       </CCol>
@@ -104,19 +106,16 @@ const Login = ({ onLoginSuccess }) => {
                   </CForm>
                 </CCardBody>
               </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
+              <CCard className="text-white login-container py-5" style={{ width: '44%' }}>
+                <CCardBody className="text-center ">
                   <div>
-                    <h2>Sign up</h2>
-                    <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                      tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <Link to="/register">
+                    <h2 className='admin-welcome-heading'>Welcome back</h2>
+                    <img src={require('../../../assets/images/ad1.png').default} alt="Welcome Image" />
+                    {/* <Link to="/register">
                       <CButton color="primary" className="mt-3" active tabIndex={-1}>
                         Register Now!
                       </CButton>
-                    </Link>
+                    </Link> */}
                   </div>
                 </CCardBody>
               </CCard>

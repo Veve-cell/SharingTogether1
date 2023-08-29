@@ -45,7 +45,6 @@ import CreateCategoryDialog from './CreateCategoryDialog'
 import CategoryTableRow from './CategoryTableRow'
 //const axios = window.axios; // Import axios for making API calls
 
-
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
@@ -95,7 +94,7 @@ export default function Category() {
 
   const [newCategory, setNewCategory] = useState({
     name: '',
-    createdBy: 2,
+    // createdBy: 2,
   });
 
   //Tạo 1 state để lưu thời điểm bấm chuột
@@ -121,6 +120,7 @@ export default function Category() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5)
 
+  // xử lý sự kiện khi bấm ra ngoài thì tự động tắt openMenu
   useEffect(() => {
     const handleClickOutside = (event, id) => {
       console.log("Clicked outside");
@@ -234,7 +234,7 @@ export default function Category() {
       const updatedData = {
         id: selectedCategory.id,
         name: selectedCategory.name,
-        createdBy: 2,
+        // createdBy: 2,
       };
 
       // Thực hiện request PUT đến API để cập nhật thông tin bản ghi

@@ -4,12 +4,12 @@ import React from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 import Dashboard from 'src/views/dashboard/Dashboard'
 
-const DefaultLayout = ({children}) => {
+const DefaultLayout = ({ isLoggedIn, setIsLoggedIn }) => {
   return (
     <div>
       <AppSidebar />
       <div className="wrapper d-flex flex-column min-vh-100">
-        <AppHeader />
+        <AppHeader isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>
         <div className="body flex-grow-1 px-3">
           {/* {children}
           <Dashboard /> */}
