@@ -3,7 +3,6 @@
 /* eslint-disable no-unused-expressions */
 import axiosClient from "./axiosClient";
 
-
 const authApi = {
   login: async (email, password) => {
     try {
@@ -12,10 +11,7 @@ const authApi = {
       console.log('Response:', response); // Log the full response to inspect its structure
 
       // Get the token directly from the response
-       const token = response.token;
-      // const {content} = response;
-      // const {login, token} = content;
-      // const {id, fullName, urlAvatar, roles} = login;
+      const token = response.token;
       const {id, fullName, urlAvatar, roles} = response.login;
 
       //Xác thực và lưu trữ token sau khi người dùng đăng nhập thành công
@@ -45,3 +41,4 @@ const authApi = {
 }
 
 export default authApi;
+export const token = localStorage.getItem('token');

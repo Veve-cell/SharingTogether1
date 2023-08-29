@@ -67,3 +67,27 @@ $custom-header-background-color: #BBE1FC; // Mã màu tùy chỉnh của bạn
 .MuiDataGrid-toolbarContainer .MuiDataGrid-toolbarButton:hover {
   color: #5878BF;
 }
+
+.admin-login-heading{
+  color: #43657D;
+}
+.admin-welcome-heading{
+  color: #9FB0BD;
+}
+
+.login-container{
+  background-color: #D4EBFC;
+}
+
+.card-login{
+  background-color: #D9EFD8;
+}
+
+.login-button {
+  background-color: #6BB57A; // Thay đổi màu nền tùy chọn
+  color: #525E75; // Thay đổi màu chữ tùy chọn
+
+  &:hover {
+    background-color: #6BB57A;
+  }
+}

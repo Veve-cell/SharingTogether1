@@ -1,320 +1,396 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-undef */
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable react/jsx-key */
+/* eslint-disable react/prop-types */
 /* eslint-disable prettier/prettier */
-import React from 'react'
-import { Helmet, HelmetProvider  } from 'react-helmet-async'
-import { filter } from 'lodash'
-import { sentenceCase } from 'change-case'
-import { useState } from 'react'
-// @mui
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Close';
 import {
-  Card,
-  Table,
+  GridRowModes,
+  DataGrid,
+  GridToolbar,
+  GridToolbarContainer,
+  GridActionsCellItem,
+  GridRowEditStopReasons,
+  GridToolbarExport,
+  GridToolbarColumnsButton,
+  GridToolbarDensitySelector,
+  GridToolbarFilterButton
+} from '@mui/x-data-grid';
+import {
+  randomId,
+} from '@mui/x-data-grid-generator';
+import { useState, useEffect } from 'react'
+import accountApi from 'src/api/accountApi';
+import {
   Stack,
-  Paper,
   Avatar,
-  Button,
-  Popover,
-  Checkbox,
-  TableRow,
-  MenuItem,
-  TableBody,
-  TableCell,
-  Container,
   Typography,
-  IconButton,
-  TableContainer,
-  TablePagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material'
 // components
-import Label from '../../../components/label'
 import Iconify from '../../../components/iconify'
-import Scrollbar from '../../../components/scrollbar'
-// sections
-import { UserListHead, UserListToolbar } from '../../../sections/@dashboard/user'
-// mock
-import USERLIST from '../../../_mock/user'
-//import {CRow } from '@coreui/react'
+import Label from '../../../components/label';
+import TextField from '@mui/material/TextField';
 
-// ----------------------------------------------------------------------
+function EditToolbar(props) {
+  const { setAccounts, setRowModesModel } = props;
 
-const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'studentCode', label: 'Student Code', alignRight: false },
-  { id: 'phoneNumber', label: 'Phone Number', alignRight: false },
-  { id: 'email', label: 'Email', alignRight: false },
-  { id: 'class', label: 'Class', alignRight: false },
-  { id: 'isOnline', label: 'Status', alignRight: false },
-  { id: '' },
-]
-// ----------------------------------------------------------------------
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
-  return 0
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy)
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index])
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0])
-    if (order !== 0) return order
-    return a[1] - b[1]
-  })
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1)
-  }
-  return stabilizedThis.map((el) => el[0])
-}
-
-export default function AdminAccount() {
-  const [open, setOpen] = useState(null)
-
-  const [page, setPage] = useState(0)
-
-  const [order, setOrder] = useState('asc')
-
-  const [selected, setSelected] = useState([])
-
-  const [orderBy, setOrderBy] = useState('name')
-
-  const [filterName, setFilterName] = useState('')
-
-  const [rowsPerPage, setRowsPerPage] = useState(5)
-
-  const handleOpenMenu = (event) => {
-    setOpen(event.currentTarget)
-  }
-
-  const handleCloseMenu = () => {
-    setOpen(null)
-  }
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc'
-    setOrder(isAsc ? 'desc' : 'asc')
-    setOrderBy(property)
-  }
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name)
-      setSelected(newSelecteds)
-      return
-    }
-    setSelected([])
-  }
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name)
-    let newSelected = []
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name)
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1))
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1))
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        //quick fix
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      )
-    }
-    setSelected(newSelected)
-  }
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event) => {
-    setPage(0)
-    setRowsPerPage(parseInt(event.target.value, 10))
-  }
-
-  const handleFilterByName = (event) => {
-    setPage(0)
-    setFilterName(event.target.value)
-  }
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName)
-
-  const isNotFound = !filteredUsers.length && !!filterName
+  const handleClick = () => {
+    const id = randomId();
+    setAccounts((oldAccounts) => [
+      ...oldAccounts,
+      {
+        id,
+        fullName: '',
+        studentCode: '',
+        phoneNumber: '',
+        email: '',
+        classCode: '',
+        name: 'Thẩm định giá và Kinh doanh bất động sản',
+      }]);
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'fullName' },
+    }));
+  };
 
   return (
-    <HelmetProvider>
-      <Helmet>
-        <title> User | Minimal UI </title>
-      </Helmet>
+    <GridToolbarContainer>
+      <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
+        Add record
+      </Button>
+    </GridToolbarContainer>
+  );
+}
 
-      <Container>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          {/* <Typography variant="h4" gutterBottom>
-            User
-          </Typography> */}
-          <Button variant="contained" style={{ backgroundColor: '#F9FFEA', color: '#000000' }} startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
-          </Button>
-          <Button variant="contained" style={{ backgroundColor: '#92BA92', color: '#000000' }} startIcon={<Iconify icon="pajamas:export" />}>
-            Export
-          </Button>
-        </Stack>
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      {/* <GridToolbar/> */}
+      <GridToolbarColumnsButton />
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
+    </GridToolbarContainer>
+  );
+}
 
-        <Card>
-          <UserListToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-          />
 
-          <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-              <Table>
-                <UserListHead
-                  order={order}
-                  orderBy={orderBy}
-                  headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
-                  numSelected={selected.length}
-                  onRequestSort={handleRequestSort}
-                  onSelectAllClick={handleSelectAllClick}
-                />
-                <TableBody>
-                  {filteredUsers
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      const { id, name, role, status, company, avatarUrl, isVerified } = row
-                      const selectedUser = selected.indexOf(name) !== -1
+export default function UserAccount() {
+  const [accounts, setAccounts] = useState([]); // Thêm state để lưu trữ danh sách tài khoản user
+  const [rowModesModel, setRowModesModel] = React.useState({});
+  const [updatedRow, setUpdatedRow] = React.useState(null);
 
-                      return (
-                        <TableRow
-                          hover
-                          key={id}
-                          tabIndex={-1}
-                          role="checkbox"
-                          selected={selectedUser}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={selectedUser}
-                              onChange={(event) => handleClick(event, name)}
-                            />
-                          </TableCell>
+  useEffect(() => {
+    // Gọi API để lấy danh sách tài khoản user từ Server
+    const fetchAccounts = async () => {
+      try {
+        const response = await accountApi.getAllUser();
+        console.log('API response: ', response);
+        const accountData = response.account; // Extract the account array
+        setAccounts(accountData); //Lưu kết quả vào state
+        // setAccountsLoaded(true); // Đánh dấu rằng dữ liệu đã được tải
+      } catch (err) {
+        console.error('Error fetching data: ', err);
+      }
+    };
+    // if (!accountsLoaded) {
+    fetchAccounts(); // Chỉ gọi API khi dữ liệu chưa được tải
+    // }
+  }, []);
 
-                          <TableCell component="th" scope="row" padding="none">
-                            <Stack direction="row" alignItems="center" spacing={2}>
-                              <Avatar alt={name} src={avatarUrl} />
-                              <Typography variant="subtitle2" noWrap>
-                                {name}
-                              </Typography>
-                            </Stack>
-                          </TableCell>
+  const handleRowEditStop = (params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    }
+  };
 
-                          <TableCell align="left">{company}</TableCell>
+  const handleEditClick = (id) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
 
-                          <TableCell align="left">{role}</TableCell>
+  const handleSaveClick = (id) => async () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  };
 
-                          <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+  const handleDeleteClick = (id) => async () => {
+    try {
+      await accountApi.remove(id); // Gọi phương thức remove với tham số id
+      setAccounts(accounts.filter((row) => row.id !== id));
+      console.log('thanhcong');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+  // hàm arrow function nhận tham số id và trả về một hàm arrow function khác (một closure). Điều này cho phép bạn truyền id vào hàm xử lý sự kiện mà không cần gọi trực tiếp.
+  //Mình đang sử dụng một kỹ thuật gọi là "currying" (tách hàm) bằng cách sử dụng các hàm arrow function liên tiếp.
 
-                          <TableCell align="left">
-                            <Label color={(status === 'banned' && 'error') || 'success'}>
-                              {sentenceCase(status)}
-                            </Label>
-                          </TableCell>
+  //tương tự như cách viết sau
+  // const handleDeleteClick = (id) => {
+  //   return () => {
+  //     const updatedAccounts = accounts.filter((row) => row.id !== id);
+  //     setAccounts(updatedAccounts);
+  //   };
+  // };
+  const handleCancelClick = (id) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    });
 
-                          <TableCell align="right">
-                            <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                              <Iconify icon={'eva:more-vertical-fill'} />
-                            </IconButton>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
+    const editedRow = accounts.find((row) => row.id === id);
+    if (editedRow.isNew) {
+      setAccounts(accounts.filter((row) => row.id !== id));
+    }
+  };
 
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
+  // const processRowUpdate = (newRow) => {
+  //   const updatedRow = { ...newRow, isNew: false };
+  //   console.log('updatedRow:', updatedRow);
+  //   setAccounts(accounts.map((row) => (row.id === newRow.id ? updatedRow : row)));
+  //   setUpdatedRow(updatedRow); // Cập nhật updatedRow vào trạng thái
+  //   return updatedRow;
+  // };
 
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
-              </Table>
-            </TableContainer>
-          </Scrollbar>
+  const processRowUpdate = async (newRow) => {
+    const updatedRow = { ...newRow, isNew: false };
+    console.log('updatedRow:', updatedRow);
+    // Chuyển đổi giá trị từ chữ sang số tùy theo tùy chọn đã chọn
+    const facultyValueMap = {
+      'Thẩm định giá và Kinh doanh bất động sản': 1,
+      'Quản trị kinh doanh': 2,
+      'Marketing': 3,
+      'Tài chính - ngân hàng': 4,
+      'Thuế và Hải quan': 5,
+      'Kế toán - Kiểm toán': 6,
+      'Công nghệ thông tin': 7,
+      'Du lịch': 8,
+      'Thương mại': 9,
+      'Ngoại ngữ': 10,
+      'Kinh tế - Luật': 11
+    }
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={USERLIST.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card>
-      </Container>
+    const facultyValue = facultyValueMap[updatedRow.name] || 0; // 0 hoặc giá trị mặc định
 
-      <Popover
-        open={Boolean(open)}
-        anchorEl={open}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            p: 1,
-            width: 140,
-            '& .MuiMenuItem-root': {
-              px: 1,
-              typography: 'body2',
-              borderRadius: 0.75,
-            },
-          },
-        }}
-      >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
+    if (updatedRow.isNew) {
+      const apiData = {
+        Name: updatedRow.fullName,
+        Email: updatedRow.email,
+        Phone: updatedRow.phoneNumber,
+        StudentCode: updatedRow.studentCode,
+        Class: updatedRow.classCode,
+        Password: updatedRow.studentCode,
+        RepeatPassword: updatedRow.studentCode,
+        Faculty: facultyValue
+        // Các thuộc tính khác tùy theo cấu trúc yêu cầu
+      };
+      try {
+        await accountApi.addUser(apiData); // Gọi API addUser tại đây
+        setAccounts(accounts.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        setUpdatedRow(updatedRow);
+        return updatedRow;
+      } catch (error) {
+        console.error('Error adding user:', error);
+        // Xử lý lỗi nếu cần
+        return newRow;
+      }
+    }
+    else {
+      const apiData = {
+        Id: updatedRow.id,
+        Email: updatedRow.email,
+        Phone: updatedRow.phoneNumber,
+        FullName: updatedRow.fullName,
+        StudentCode: updatedRow.studentCode,
+        FacultyId: facultyValue,
+        Class: updatedRow.classCode,
+        // Password: updatedRow.studentCode,
+        // RepeatPassword: updatedRow.studentCode,
+        // Các thuộc tính khác tùy theo cấu trúc yêu cầu
+      };
 
-        <MenuItem sx={{ color: 'error.main' }}>
-          <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-          Delete
-        </MenuItem>
-      </Popover>
-    </HelmetProvider>
-  )
+      try {
+        await accountApi.update(apiData);
+        setAccounts(accounts.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        setUpdatedRow(updatedRow);
+        return updatedRow;
+      } catch (error) {
+        console.error('Error update user:', error);
+        // Xử lý lỗi nếu cần
+        return newRow;
+      }
+    }
+
+  };
+
+  const handleRowModesModelChange = (newRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+  const columns = [
+    { field: 'id', headerName: 'Id', width: 80 },
+    {
+      field: 'fullName',
+      headerName: 'Full Name',
+      width: 180,
+      editable: true,
+      renderCell: (params) => {
+        return (
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Avatar alt={params.row.fullName} src={params.row.urlAvatar} />
+            <Typography variant="subtitle2" noWrap>
+              {params.row.fullName}
+            </Typography>
+          </Stack>
+        );
+      }
+    },
+    { field: 'studentCode', headerName: 'Student Code', width: 180, editable: true },
+    { field: 'phoneNumber', headerName: 'Phone Number', width: 180, editable: true },
+    { field: 'email', headerName: 'Email', width: 180, editable: true },
+    { field: 'classCode', headerName: 'Class', width: 180, editable: true },
+    {
+      field: 'isOnline',
+      headerName: 'Status',
+      width: 180,
+      renderCell: (params) => (
+        <Label color={params.value ? 'success' : 'banned' && 'error'}>
+          {params.value ? 'Online' : 'Offline'}
+        </Label>
+      )
+    },
+    {
+      field: 'name',
+      headerName: 'Faculty',
+      width: 220,
+      editable: true,
+      type: 'singleSelect',
+      valueOptions: [
+        'Thẩm định giá và Kinh doanh bất động sản',
+        'Quản trị kinh doanh',
+        'Marketing',
+        'Tài chính - ngân hàng',
+        'Thuế và Hải quan',
+        'Kế toán - Kiểm toán',
+        'Công nghệ thông tin',
+        'Thương mại',
+        'Ngoại ngữ',
+        'Kinh tế - Luật'
+      ],
+    },
+    {
+      field: 'isActive',
+      headerName: 'isActive',
+      width: 180,
+      renderCell: (params) => (
+        <Label color={params.value === 'True' ? 'success' : 'error'}>
+          {params.value === 'True' ? 'True' : 'False'}
+        </Label>
+      ),
+      editable: true,
+      type: 'singleSelect',
+      valueOptions: ['True', 'False']
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Actions',
+      width: 100,
+      cellClassName: 'actions',
+      getActions: ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Save"
+              sx={{
+                color: 'primary.main',
+              }}
+              onClick={handleSaveClick(id)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label="Cancel"
+              className="textPrimary"
+              onClick={handleCancelClick(id)}
+              color="inherit"
+            />,
+          ];
+        }
+
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            onClick={handleEditClick(id)}
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={handleDeleteClick(id)}
+            color="inherit"
+          />,
+        ];
+      },
+    },
+  ];
+
+  return (
+
+    <Box
+      sx={{
+        height: 500,
+        width: '100%',
+        '& .actions': {
+          color: 'text.secondary',
+        },
+        '& .textPrimary': {
+          color: 'text.primary',
+        },
+      }}
+    >
+      <div style={{ height: 400, width: '100%' }} className='custom-data-grid'>
+        <DataGrid
+          rows={accounts}
+          columns={columns}
+          editMode="row"
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={handleRowModesModelChange}
+          onRowEditStop={handleRowEditStop}
+          processRowUpdate={processRowUpdate}
+          classes={{
+            root: 'hide-default-export-button', // Thêm lớp ẩn nút export mặc định
+          }}
+          enableRowSelection
+          slots={{
+            toolbar: (props) => (
+              <React.Fragment>
+                <EditToolbar {...props} />
+                <CustomToolbar />
+              </React.Fragment>
+            ),
+          }}
+          slotProps={{
+            toolbar: { setAccounts, setRowModesModel },
+          }}
+        />
+      </div>
+    </Box>
+  );
 }

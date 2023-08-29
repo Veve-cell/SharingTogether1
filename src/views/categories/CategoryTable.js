@@ -64,36 +64,6 @@ function CategoryTable({
               onRequestSort={handleRequestSort}
               onSelectAllClick={handleSelectAllClick}
             />
-            {/* <TableBody>
-              {filteredCategories
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((category) => {
-                  const { id } = category;
-                  const selectedUser = selected.indexOf(id) !== -1
-
-                  return (
-                    <CategoryTableRow
-                      key={id}
-                      category={category}
-                      selectedUser = { selectedUser}
-                      handleClick = { handleClick}
-                      handleOpenMenu = { handleOpenMenu}
-                      handleMouseDown = {handleMouseDown}
-                      open = {open}
-                      handleCloseMenu = {handleCloseMenu}
-                      handleOpenEditModal = {handleOpenEditModal}
-                      handleDelete = {handleDelete}
-                    >
-                    </CategoryTableRow>
-                  )
-                })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody> */}
-
             <TableBody>
               {filteredCategories
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)

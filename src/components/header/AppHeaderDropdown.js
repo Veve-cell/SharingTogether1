@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-undef */
 import React from 'react'
@@ -24,15 +25,20 @@ import {
 } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 
-import avatar8 from './../../assets/images/avatars/8.jpg'
+import avatarcat1 from './../../assets/images/avatars/avatarcat1.png'
 import authApi from 'src/api/authApi'
 import { useNavigate } from 'react-router-dom'
+import { useHistory } from 'react-router';
 
-const AppHeaderDropdown = () => {
-  const navigate = useNavigate();
+const AppHeaderDropdown = ({ isLoggedIn, setIsLoggedIn }) => {
+  //const navigate = useNavigate();
   const handleLogout = () => {
+    setIsLoggedIn(false);
     authApi.logout();
-    navigate('/Login');
+    //navigate('/Login');
+  //   console.log('Token removed:', localStorage.getItem('token')); // Check if the token has been removed
+  // //   // Redirect to the login page
+  //   window.location.replace('/Login');
   }
 
   //Thực hiện lấy thông tin user từ authApi
@@ -49,7 +55,7 @@ const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
-        <CAvatar src={user?.urlAvatar || avatar8} size="md" />
+        <CAvatar src={user?.urlAvatar || avatarcat1} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
